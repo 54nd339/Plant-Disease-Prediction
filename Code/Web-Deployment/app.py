@@ -274,7 +274,6 @@ labels = {
 }
 
 app = Flask(__name__)
-
 @app.route("/", methods=['GET', 'POST'])
 def home():
     return render_template('index.html')
@@ -283,12 +282,8 @@ def home():
 def predict():
     if request.method == 'POST':
         file = request.files['image']
-        filename = file.filename
-        
-        file_path = os.path.join('Testing-Images', filename)
-        with open(file_path, 'rb') as f:
-            file_data = "data:image/jpg;base64," + base64.b64encode(f.read()).decode('utf-8')
-        
+        data = base64.b64encode(file.read()).decode('utf-8')
+        file_data = "data:image/jpg;base64," + data
         try:
             response = requests.post("https://jkompalli-pdd.hf.space/run/predict", json={
                 "data": [ file_data ]

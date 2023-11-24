@@ -91,11 +91,11 @@ class ResNet18(Model):
 model = ResNet18(38)
 model.build(input_shape = (None,256,256,3))
 cyclical_learning_rate = CyclicalLearningRate(
-     initial_learning_rate=3e-7,
-     maximal_learning_rate=0.001,
-     step_size=38,
-     scale_fn=lambda x: 1 / (2.0 ** (x - 1)),
-     scale_mode='cycle'
+    initial_learning_rate=3e-7,
+    maximal_learning_rate=0.001,
+    step_size=38,
+    scale_fn=lambda x: 1 / (2.0 ** (x - 1)),
+    scale_mode='cycle'
 )
 
 optimizer = tf.keras.optimizers.Adam(learning_rate = cyclical_learning_rate, clipvalue=0.1)                         
