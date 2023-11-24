@@ -1,6 +1,8 @@
-import requests
-import base64
+# import requests
+# import base64
+
 from flask import Flask, render_template, request
+from gradio_client import Client
 
 labels = {
     0: {
@@ -32,237 +34,244 @@ labels = {
         'suggested_pesticides': 'No pesticides are needed.'
     },
     4: {
+        'id': 38,
+        'name': 'Not A Plant Leaf',
+        'description': 'This is not a plant leaf. Please upload a picture of a plant leaf.',
+        'treatment': 'No treatment is needed.',
+        'suggested_pesticides': 'No pesticides are needed.'
+    },
+    5: {
         'id': 5,
         'name': 'Healthy Blueberry',
         'description': 'This is a healthy blueberry leaf.',
         'treatment': 'No treatment is needed.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    5: {
+    6: {
         'id': 7,
         'name': 'Cherry Powdery Mildew',
         'description': 'Powdery mildew is a fungal disease that affects a wide range of plants. Powdery mildew diseases are caused by many different species of fungi in the order Erysiphales, with Podosphaera xanthii (a.k.a. Sphaerotheca fuliginea) being the most commonly reported cause. Erysiphe cichoracearum was formerly reported to be the primary causal organism throughout most of the world. Powdery mildew is one of the easier plant diseases to identify, as its symptoms are quite distinctive. Infected plants display white powdery spots on the leaves and stems. The lower leaves are the most affected, but the mildew can appear on any above-ground part of the plant. As the disease progresses, the spots get larger and denser as large numbers of asexual spores are formed, and the mildew may spread up and down the length of the plant.',
         'treatment': 'Practice good tree care by keeping your cherry tree healthy with regular watering, fertilization, and pruning to help it resist diseases like powdery mildew.',
         'suggested_pesticides': 'Sulfur, Potassium bicarbonate, Thiophanate-methyl, Myclobutanil, Propiconazole, Tebuconazole, Trifloxystrobin'
     },
-    6: {
+    7: {
         'id': 6,
         'name': 'Healthy Cherry',
         'description': 'This is a healthy cherry leaf.',
         'treatment': 'No treatment is needed.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    7: {
+    8: {
         'id': 8,
         'name': 'Corn Gray Leaf Spot',
         'description': 'Gray leaf spot (GLS) is a foliar fungal disease that affects maize, also known as corn. The pathogen that causes gray leaf spot is Cercospora zeae-maydis. Cercospora zeae-maydis survives the winter on corn residue and infects the crop in warm, humid weather. The disease is most severe when temperatures range from 75 to 85 °F (24 to 29 °C) and free moisture is present for 11 to 17 hours per day. The disease is most severe in continuous corn fields, especially when minimum tillage is practiced. The disease is also more severe when corn follows corn in a rotation. Gray leaf spot is a significant threat to maize production in the U.S. Corn Belt, where losses due to GLS are estimated to be as high as one billion dollars annually.',
         'treatment': 'Fungicides can be used to prevent infection of apple trees.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Tebuconazole, Thiophanate-methyl, Trifloxystrobin, Copper, Sulfur'
     },
-    8: {
+    9: {
         'id': 9,
         'name': 'Corn Common Rust',
         'description': 'Common rust (also called southern rust) is a fungal disease of corn. Symptoms first appear as small, circular, reddish-brown spots on the leaves, leaf sheaths, and husks of corn. These spots produce masses of orange spores that are easily rubbed off, giving the plant a dusty appearance. Common rust is favored by high humidity and warm temperatures. The disease is most severe on late-planted corn and on corn with high nitrogen levels. Common rust is not usually economically important in field corn, but it can cause significant yield losses in sweet corn.',
         'treatment': 'Fungicides can be used to prevent infection of apple trees.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Tebuconazole, Thiophanate-methyl, Trifloxystrobin, Copper, Sulfur'
     },
-    9: {
+    10: {
         'id': 11,
         'name': 'Corn Northern Leaf Blight',
         'description': 'Northern corn leaf blight (NCLB) is a foliar disease of corn (maize) caused by Exserohilum turcicum, the anamorph of the ascomycete Setosphaeria turcica. The fungus causes lesions on the leaves, husks, leaf collars, leaf sheaths, and stalks. Lesions may coalesce to form large areas of blighted tissue. The disease is favored by moderate temperatures (68 to 89 °F, 20 to 32 °C) and high relative humidity (greater than 75%). The disease is most severe when corn is in the tasseling and silking growth stages. Yield losses of up to 50% have been reported in susceptible varieties.',
         'treatment': 'Avoid planting corn in the same field for consecutive years to reduce the risk of infection. Fungicides can be used to prevent infection of apple trees.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Tebuconazole, Thiophanate-methyl, Trifloxystrobin, Copper, Sulfur'
     },
-    10: {
+    11: {
         'id': 10,
         'name': 'Healthy Corn',
         'description': 'This is a healthy corn leaf.',
         'treatment': 'No treatment is needed.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    11: {
+    12: {
         'id': 12,
         'name': 'Grape Black Rot',
         'description': 'Black rot is a fungal disease that affects various fruits and vegetables. It is caused by an ascomycetous fungus, Guignardia bidwellii, which infects the tissues of the grape. The fungus can infect all green parts of the grapevine including leaves, shoots, tendrils, flowers and fruit. The disease is spread by rain, wind and insects. The disease overwinters in infected canes. The disease is common in warm, humid climates and is most severe in wet weather during flowering and fruit development. The disease is difficult to control using fungicides.',
         'treatment': 'Keep your grapevines healthy with regular watering, fertilization, and pruning to help them resist diseases like black rot.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Ziram'
     },
-    12: {
+    13: {
         'id': 13,
         'name': 'Grape Esca (Black Measles)',
         'description': 'Esca is a complex disease of grapevines that causes leaf discoloration, wood necrosis, and eventual death. The disease is commonly found in Europe and the Middle East, but has spread to vineyards around the world. The disease is caused by a number of different fungi, including Phaeomoniella chlamydospora, Phaeoacremonium aleophilum, and Fomitiporia mediterranea. Esca is difficult to control using fungicides.',
         'treatment': 'Inject fungicides directly into the trunk of the grapevine to help prevent and control Esca. This is a particularly effective treatment for grapevines that are already infected with the disease. Prune grapevines carefully to reduce the number of potential sites for infection. Cut out all diseased wood and prune out crossing branches, which can create wounds that are susceptible to infection.',
         'suggested_pesticides': 'Boscalid, Copper based fungicides and Triazole'
     },
-    13: {
+    14: {
         'id': 15,
         'name': 'Grape Leaf Blight (Isariopsis Leaf Spot)',
         'description': 'Isariopsis leaf spot is a fungal disease that affects grapevines. The disease is caused by the fungus Isariopsis griseola. The fungus infects the leaves of the grapevine, causing small, angular spots to form. The spots are initially yellow, but turn reddish-brown as they age. The disease is most severe in warm, humid climates. The disease is difficult to control using fungicides.',
         'treatment': 'Keep your grapevines healthy with regular watering, fertilization, and pruning to help them resist diseases like Isariopsis leaf spot.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Ziram'
     },
-    14: {
+    15: {
         'id': 14,
         'name': 'Healthy Grape',
         'description': 'This is a healthy grape leaf.',
         'treatment': 'No treatment is needed.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    15: {
+    16: {
         'id': 16,
         'name': 'Orange Haunglongbing (Citrus Greening)',
         'description': 'Citrus greening disease, also known as Huanglongbing, is a bacterial disease of citrus plants. Symptoms include yellowing of the leaves, tree decline, and reduced fruit size and quality. The disease is spread by the Asian citrus psyllid, Diaphorina citri, and is difficult to control using pesticides. The disease is most severe in warm, humid climates.',
         'treatment': 'Remove and destroy infected trees. Keep your citrus trees healthy with regular watering, fertilization, and pruning to help them resist diseases like citrus greening.',
         'suggested_pesticides': 'Oxytetracycline, Streptomycin'
     },
-    16: {
+    17: {
         'id': 17,
         'name': 'Peach Bacterial Spot',
         'description': 'Bacterial spot is a disease of stone fruits, including peach, nectarine, apricot, plum and cherry, caused by the bacterium Xanthomonas arboricola. The disease causes leaf spots, fruit spots, and stem cankers. The disease is spread by rain, wind and insects. The disease is most severe in warm, humid climates.',
         'treatment': 'Keep your peach trees healthy with regular watering, fertilization, and pruning to help them resist diseases like bacterial spot.',
         'suggested_pesticides': 'Copper based fungicides'
     },
-    17: {
+    18: {
         'id': 18,
         'name': 'Healthy Peach',
         'description': 'This is a healthy peach leaf.',
         'treatment': 'No treatment is needed.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    18: {
+    19: {
         'id': 19,
         'name': 'Bell Pepper Bacterial Spot',
         'description': 'Bacterial spot is a disease of peppers, caused by the bacterium Xanthomonas campestris. The disease causes leaf spots, fruit spots, and stem cankers. The disease is spread by rain, wind and insects. The disease is most severe in warm, humid climates.',
         'treatment': 'Seed treatment with hot water, soaking seeds for 30 minutes in water pre-heated to 125 F/51 C, is effective in reducing bacterial populations on the surface and inside the seeds. However, seed germination may be affected by heat treatment if not done accurately, while the risk is relatively low with bleach treatment.',
         'suggested_pesticides': 'Copper sprays with Regalia or Actigard'
     },
-    19: {
+    20: {
         'id': 20,
         'name': 'Healthy Bell Pepper',
         'description': 'This is a healthy bell pepper leaf.',
         'treatment': 'No treatment is needed.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    20: {
+    21: {
         'id': 21,
         'name': 'Potato Early Blight',
         'description': 'Early blight is a fungal disease of potatoes caused by Alternaria solani. The disease affects the leaves, stems, and tubers of potato plants. The disease is most severe in warm, humid climates.',
         'treatment': 'Make sure to disinfect your pruning shears (one part bleach to 4 parts water) after each cut. Keep the soil under plants clean and free of garden debris. Add a layer of organic compost to prevent the spores from splashing back up onto vegetation.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Ziram'
     },
-    21: {
+    22: {
         'id': 23,
         'name': 'Potato Late Blight',
         'description': 'Late blight is a fungal disease of potatoes caused by Phytophthora infestans. The disease affects the leaves, stems, and tubers of potato plants. The disease is most severe in warm, humid climates.',
         'treatment': 'Plant resistant cultivars when available. Remove volunteers from the garden prior to planting and space plants far enough apart to allow for plenty of air circulation. Water in the early morning hours, or use soaker hoses, to give plants time to dry out during the day — avoid overhead irrigation. Destroy all tomato and potato debris after harvest (see Fall Garden Cleanup).',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Ziram'
     },
-    22: {
+    23: {
         'id': 22,
         'name': 'Healthy Potato',
         'description': 'This is a healthy potato leaf.',
         'treatment': 'No treatment is needed.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    23: {
+    24: {
         'id': 24,
         'name': 'Healthy Raspberry',
         'description': 'This is a healthy raspberry leaf.',
         'treatment': 'No treatment is needed.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    24: {
+    25: {
         'id': 25,
         'name': 'Healthy Soybean',
         'description': 'This is a healthy soybean leaf.',
         'treatment': 'No treatment is needed.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    25: {
+    26: {
         'id': 26,
         'name': 'Squash Powdery Mildew',
         'description': 'Powdery mildew is a fungal disease that affects a wide range of plants. Powdery mildew diseases are caused by many different species of fungi in the order Erysiphales, with Podosphaera xanthii (a.k.a. Sphaerotheca fuliginea) being the most commonly reported cause. Erysiphe cichoracearum was formerly reported to be the primary causal organism throughout most of the world. Powdery mildew is one of the easier plant diseases to identify, as its symptoms are quite distinctive. Infected plants display white powdery spots on the leaves and stems. The lower leaves are the most affected, but the mildew can appear on any above-ground part of the plant. As the disease progresses, the spots get larger and denser as large numbers of asexual spores are formed, and the mildew may spread up and down the length of the plant.',
         'treatment': 'A treatment solution for your squash plants is baking soda. Baking soda is an excellent option for treating powdery mildew. It is readily available in your home and will not cause any harm to the surrounding vegetable plants. With the baking soda method, you will also need some cooking oil and some dish soap.',
         'suggested_pesticides': 'Potassium bicarbonate, Propiconazole and Azoxystrobin.'
     },
-    26: {
+    27: {
         'id': 28,
         'name': 'Strawberry Leaf Scorch',
         'description': 'Strawberry leaf scorch is a disease of strawberries caused by the bacterium Xylella fastidiosa. The disease causes leaf spots, fruit spots, and stem cankers. The disease is spread by rain, wind and insects. The disease is most severe in warm, humid climates.',
         'treatment': 'Remove and destroy infected plants. Do not compost. Wash hands and tools thoroughly after working with infected plants. Control aphids, which can spread the virus.',
         'suggested_pesticides': 'Copper sprays with Regalia or Actigard'
     },
-    27: {
+    28: {
         'id': 27,
         'name': 'Healthy Strawberry',
         'description': 'This is a healthy strawberry leaf.',
         'treatment': 'No treatment is needed.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    28: {
+    29: {
         'id': 29,
         'name': 'Tomato Bacterial Spot',
         'description': 'Bacterial spot is a disease of tomatoes, caused by the bacterium Xanthomonas campestris. The disease causes leaf spots, fruit spots, and stem cankers. The disease is spread by rain, wind and insects. The disease is most severe in warm, humid climates.',
         'treatment': 'Remove and destroy infected plants. Do not compost. Wash hands and tools thoroughly after working with infected plants. Control aphids, which can spread the virus.',
         'suggested_pesticides': 'Copper sprays with Regalia or Actigard'
     },
-    29: {
+    30: {
         'id': 30,
         'name': 'Tomato Early Blight',
         'description': 'Early blight is a fungal disease of tomatoes caused by Alternaria solani. The disease affects the leaves, stems, and fruit of tomato plants. The disease is most severe in warm, humid climates.',
         'treatment': 'Remove and destroy infected plants. Do not compost. Wash hands and tools thoroughly after working with infected plants. Control aphids, which can spread the virus.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Ziram'
     },
-    30: {
+    31: {
         'id': 32,
         'name': 'Tomato Late Blight',
         'description': 'Late blight is a disease caused by the oomycete pathogen Phytophthora infestans. It was a major culprit in the 1840s European, the 1845 Irish, and the 1846 Highland potato famines. The organism can also infect some other members of the Solanaceae. The disease is characterized by large lesions on the leaves, stems, and fruit, which can quickly kill the plant. Tomato late blight is caused by the fungus-like oomycete pathogen Phytophthora infestans. It is the same pathogen that caused the 1840s European, 1845 Irish, and 1846 Highland potato famines. The disease is characterized by large lesions on the leaves, stems, and fruit, which can quickly kill the plant.',
         'treatment': 'Remove and destroy infected plants. Do not compost. Wash hands and tools thoroughly after working with infected plants. Control aphids, which can spread the virus.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Ziram'
     },
-    31: {
+    32: {
         'id': 33,
         'name': 'Tomato Leaf Mold',
         'description': 'Leaf mold is a fungal disease of tomatoes, caused by the fungus Passalora fulva (previously known as Fulvia fulva or Cladosporium fulvum). The disease primarily affects older leaves, starting with the lower leaves and moving upwards in the plant. The disease rarely kills the plant, but can significantly reduce fruit yields and fruit quality. Affected fruits are less marketable due to the presence of the black fungal lesions.',
         'treatment': 'Remove and destroy infected plants. Do not compost. Wash hands and tools thoroughly after working with infected plants. Control aphids, which can spread the virus.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Ziram'
     },
-    32: {
+    33: {
         'id': 34,
         'name': 'Tomato Septoria Leaf Spot',
         'description': 'Septoria leaf spot is a disease of tomato caused by the fungus Septoria lycopersici. Symptoms include grayish-white spots on the leaves that are circular and have dark brown margins. The disease is spread by rain, wind and insects. The disease is most severe in warm, humid climates.',
         'treatment': 'Remove infected leaves immediately. Do not compost. Wash hands and tools thoroughly after working with infected plants. Control aphids, which can spread the virus.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Propiconazole, Myclobutanil, Pyraclostrobin, Ziram'
     },
-    33: {
+    34: {
         'id': 35,
         'name': 'Tomato Spider Mites',
         'description': 'Spider mites are members of the Acari (mite) family Tetranychidae, which includes about 1,200 species. They generally live on the undersides of leaves of plants, where they may spin protective silk webs, and they can cause damage by puncturing the plant cells to feed. Spider mites are known to feed on several hundred species of plants.',
         'treatment': 'Spider mites are not insects but are more closely related to spiders. They are tiny, less than 1/50 inch (0.4 mm) long, and vary in color. Spider mites thrive in hot, dry conditions, but excessive moisture can cause populations to explode temporarily. Spider mites have a wide host range and over 120 plant species have been reported as being attacked. They are a common pest of field-grown tomatoes.',
         'suggested_pesticides': 'Acaricides, Bifenazate, Fenpyroximate, Hexythiazox, Pyridaben, Spiromesifen, Spirotetramat'
     },
-    34: {
+    35: {
         'id': 36,
         'name': 'Tomato Target Spot',
         'description': 'Target spot is a fungal disease of tomatoes caused by Corynespora cassiicola. The disease causes leaf spots, stem cankers, and fruit spots. The disease is spread by rain, wind and insects. The disease is most severe in warm, humid climates.',
         'treatment': 'Warm wet conditions favor the disease such that fungicides are needed to give adequate control. The products to use are chlorothalonil, copper oxychloride or mancozeb. Treatment should start when the first spots are seen and continue at 10-14-day intervals until 3-4 weeks before last harvest.',
         'suggested_pesticides': 'Chlorothalonil, Mancozeb, Copper'
     },
-    35: {
+    36: {
         'id': 38,
         'name': 'Tomato Yellow Leaf Curl Virus',
         'description': 'Tomato yellow leaf curl virus is a DNA virus from the genus Begomovirus and the family Geminiviridae. It is a virus specific to plants of the genus tomato including tomato and tomato. It is transmitted by the whitefly Bemisia tabaci.',
         'treatment': 'Once infected with the virus, there are no treatments against the infection. Control the whitefly population to avoid the infection with the virus. Insecticides of the family of the pyrethroids used as soil drenches or spray during the seedling stage can reduce the population of whiteflies.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    36: {
+    37: {
         'id': 37,
         'name': 'Tomato Mosaic Virus',
         'description': 'Tomato mosaic virus is a virus that affects plants of the family Solanaceae, including tomatoes. The original mosaic virus (Tomato mosaic virus, ToMV) was first identified in 1935 by H. H. Flor in Florida, US. The virus is one of the most common viruses affecting tomatoes.',
         'treatment': 'Remove infected plants immediately. Do not compost. Wash hands and tools thoroughly after working with infected plants. Control aphids, which can spread the virus.',
         'suggested_pesticides': 'No pesticides are needed.'
     },
-    37: {
+    38: {
         'id': 31,
         'name': 'Healthy Tomato',
         'description': 'This is a healthy tomato leaf.',
@@ -270,7 +279,7 @@ labels = {
         'suggested_pesticides': 'No pesticides are needed.'
     }
 }
-
+client = Client("https://jkompalli-trained-prediction.hf.space/--replicas/r7j7b/")
 app = Flask(__name__)
 
 @app.route("/", methods=['GET', 'POST'])
@@ -281,19 +290,25 @@ def home():
 def predict():
     if request.method == 'POST':
         file = request.files['image']
-        data = base64.b64encode(file.read()).decode('utf-8')
-        file_data = "data:image/jpg;base64," + data
+        # data = base64.b64encode(file.read()).decode('utf-8')
+        # file_data = "data:image/jpg;base64," + data
         
         try:
-            response = requests.post("https://jkompalli-pdd.hf.space/run/predict", json={
-                "data": [ file_data ]
-            }).json()
+            # response = requests.post("https://jkompalli-pdd.hf.space/run/predict", json={
+            #     "data": [ file_data ]
+            # }).json()
             
-            confidence = round(response['data'][0]['confidences'][0]['confidence'] * 100, 2)
-            response = int(response['data'][0]['label'].split(':')[0])
+            image_path = "temp.jpg"
+            with open(image_path, "wb") as f:
+                f.write(file.read())
+                
+            response = client.predict(image_path, api_name="/predict")
+            confidence = round(response['confidences'][0]['confidence'] * 100, 2)
+            response = int(response['label'].split(':')[0])
+
         except Exception as e:
             print("Error: ", e)
-
+        
         return render_template('analysis.html', confidence = confidence,
                                prediction = labels[response]['name'],
                                image_name = f"images/{labels[response]['id']}.jpg",
