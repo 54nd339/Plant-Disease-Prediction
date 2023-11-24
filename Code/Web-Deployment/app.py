@@ -1,5 +1,6 @@
 # import requests
 # import base64
+import os
 
 from flask import Flask, render_template, request
 from gradio_client import Client
@@ -7,10 +8,12 @@ from labels import classes
 
 client = Client("https://jkompalli-trained-prediction.hf.space/--replicas/r7j7b/")
 app = Flask(__name__)
+
 @app.route("/", methods=['GET', 'POST'])
 def home():
     return render_template('index.html')
 
+# NOTE: Comment line 9 & 29-32 if you are uncommenting the commented lines
 @app.route("/predict", methods = ['GET','POST'])
 def predict():
     if request.method == 'POST':
@@ -30,9 +33,11 @@ def predict():
             response = client.predict(image_path, api_name="/predict")
             confidence = round(response['confidences'][0]['confidence'] * 100, 2)
             response = int(response['label'].split(':')[0])
+            os.remove(image_path)
 
         except Exception as e:
             print("Error: ", e)
+            return render_template('index.html')
         
         return render_template('analysis.html', confidence = confidence,
                                prediction = classes[response]['name'],
