@@ -19,22 +19,19 @@ def predict():
      if request.method == 'POST':
         file = request.files['image'] # fet input
         app.logger.info(file)
-        filename = file.filename        
+        filename = file.filename  
         
-        file_path = os.path.join('E:/Z My Works/Codehastra_Hackathon/Web-Deployment/static/upload/test/', filename)
-        file.save(file_path)
-
-        with open(file_path, "rb") as image_file:
-            file_data = base64.b64encode(image_file.read()).decode('utf-8')
+        file_path = os.path.join('static/upload/test', filename)
+        with open(file_path, 'rb') as f:
+            file_data = base64.b64encode(f.read()).decode('utf-8')
         
-        # Pass the image to the model
+        # Send file name to client
         try:
-            result = client.predict(file_data, api_name="/predict")
-            pred = result["label"]
-            # output_page = result["output_page"]
-            print(pred)
+            result = client.predict({"image": file_data}
+                                    , api_name="/predict")
+            print(result)
         except Exception as e:
-            print(e)
+            print("Error: ", e)
 
         pred, output_page = "Not_a_plant", "Not_a_plant.html" 
         return render_template(output_page, pred_output = pred, user_image = file_path)
