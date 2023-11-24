@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.1/css/bootstrap.min.css"
       integrity="sha384-VCmXjywReHh4PwowAiWNagnWcLhlEJLA5buUprzK8rxFgeH0kww/aWY76TfkUoSX" crossorigin="anonymous">
     <title>PLANT LEAF DISEASE PREDICTION</title>
@@ -29,6 +28,7 @@
           <span class="border border-primary">
             <img src="{{url_for('static',filename = image_name)}}" alt="Image" width="400px" height="400px">
           </span>
+          <span class="text-center mt-2"><h4>{{confidence}}% confident</h4></span>
         </div>
         <div class="col-sm">
           <div>

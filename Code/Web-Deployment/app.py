@@ -283,7 +283,6 @@ def home():
 def predict():
     if request.method == 'POST':
         file = request.files['image']
-        app.logger.info(file)
         filename = file.filename
         
         file_path = os.path.join('Testing-Images', filename)
@@ -295,11 +294,12 @@ def predict():
                 "data": [ file_data ]
             }).json()
             
+            confidence = round(response['data'][0]['confidences'][0]['confidence'] * 100, 2)
             response = int(response['data'][0]['label'].split(':')[0])
         except Exception as e:
             print("Error: ", e)
 
-        return render_template('analysis.html',
+        return render_template('analysis.html', confidence = confidence,
                                prediction = labels[response]['name'],
                                image_name = f"images/{labels[response]['id']}.jpg",
                                description = labels[response]['description'],
