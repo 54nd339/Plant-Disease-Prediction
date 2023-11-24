@@ -2,7 +2,7 @@ import gradio as gr
 import tensorflow as tf
 
 from tensorflow_addons.optimizers import CyclicalLearningRate
-from keras.layers import Dense, Conv2D, MaxPool2D, Flatten, Softmax, GlobalAveragePooling2D, BatchNormalization, Add, SeparableConv2D
+from keras.layers import Dense, Conv2D, MaxPool2D, Flatten, GlobalAveragePooling2D, BatchNormalization, Add, SeparableConv2D
 from keras.models import Model
 
 @tf.autograph.experimental.do_not_convert
@@ -10,7 +10,6 @@ class ResnetBlock(Model):
     """
     A standard resnet block.
     """
-
     def __init__(self, channels: int, down_sample=False):
         """
         channels: same as number of convolution kernels
@@ -143,9 +142,7 @@ labels = {
     36: 'Tomato Mosaic Virus',
     37: 'Healthy Tomato'
 }
-
 imgSize = 200
-
 def classify_image(inp):
     inp = inp.reshape(-1, imgSize, imgSize, 3)
     inp = tf.cast(inp, tf.float32)

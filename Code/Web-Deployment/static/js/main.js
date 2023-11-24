@@ -15,6 +15,7 @@ $(document).ready(function () {
             reader.readAsDataURL(input.files[0]);
         }
     }
+    
     $("#imageUpload").change(function () {
         $('.image-section').show();
         $('#btn-predict').show();
@@ -26,10 +27,8 @@ $(document).ready(function () {
         readURL(this);
     });
 
-    // Predict
     $('#btn-predict').click(function () {
         var form_data = new FormData($('#upload-file')[0]);
-
         $(this).hide();
         $('.loader').show();
 
@@ -47,7 +46,5 @@ $(document).ready(function () {
                 $('#result').text('Result: ' + data);
             },
         });
-		
     });
-
 });

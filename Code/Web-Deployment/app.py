@@ -282,15 +282,13 @@ def home():
 @app.route("/predict", methods = ['GET','POST'])
 def predict():
     if request.method == 'POST':
-        file = request.files['image'] # fet input
+        file = request.files['image']
         app.logger.info(file)
         filename = file.filename
         
         file_path = os.path.join('Testing-Images', filename)
         with open(file_path, 'rb') as f:
-            file_data = base64.b64encode(f.read()).decode('utf-8')
-        
-        file_data = "data:image/jpg;base64," + file_data
+            file_data = "data:image/jpg;base64," + base64.b64encode(f.read()).decode('utf-8')
         
         try:
             response = requests.post("https://jkompalli-pdd.hf.space/run/predict", json={
@@ -301,17 +299,12 @@ def predict():
         except Exception as e:
             print("Error: ", e)
 
-        output_label = labels[response]['id']
-        output_pred = labels[response]['name']
-        output_desc = labels[response]['description']
-        output_treat = labels[response]['treatment']
-        output_pest = labels[response]['suggested_pesticides']
         return render_template('analysis.html',
-                               prediction = output_pred,
-                               image_name = f'images/{output_label}.jpg',
-                               description = output_desc,
-                               treatment = output_treat,
-                               pesticides = output_pest,)
+                               prediction = labels[response]['name'],
+                               image_name = f"images/{labels[response]['id']}.jpg",
+                               description = labels[response]['description'],
+                               treatment = labels[response]['treatment'],
+                               pesticides = labels[response]['suggested_pesticides'])
     
 if __name__ == "__main__":
     app.run(threaded=False,port=8080) 
