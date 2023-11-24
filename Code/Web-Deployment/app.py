@@ -1,7 +1,6 @@
 import requests
 from flask import Flask, render_template, request
 import base64
-import os
 import requests
 
 labels = {
@@ -284,6 +283,7 @@ def predict():
         file = request.files['image']
         data = base64.b64encode(file.read()).decode('utf-8')
         file_data = "data:image/jpg;base64," + data
+        
         try:
             response = requests.post("https://jkompalli-pdd.hf.space/run/predict", json={
                 "data": [ file_data ]
