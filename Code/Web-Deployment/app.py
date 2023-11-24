@@ -1,7 +1,6 @@
 import requests
-from flask import Flask, render_template, request
 import base64
-import requests
+from flask import Flask, render_template, request
 
 labels = {
     0: {
@@ -273,6 +272,7 @@ labels = {
 }
 
 app = Flask(__name__)
+
 @app.route("/", methods=['GET', 'POST'])
 def home():
     return render_template('index.html')
